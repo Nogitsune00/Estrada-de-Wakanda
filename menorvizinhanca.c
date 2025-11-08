@@ -19,22 +19,34 @@ double calcularMenorVizinhanca(const char *nomeArquivo) {
     char nome[256];
     
     
-    double menor=9999999;
+    
     for (int i = 0; i < N; i++) {
         fscanf(arq, "%d %[^\n]", &pos[i], &nome);
-       
-        if(pos[i]<menor){
-            menor=pos[i];
-        }
         
        
 
     }
-    printf("Menor vizinhanca de estrada: %.2lf", menor);
+
+     for (int i = 0; i < N - 1; i++) {
+        for (int j = i + 1; j < N; j++) {
+            if (pos[j] < pos[i]) {
+                int temp = pos[i];
+                pos[i] = pos[j];
+                pos[j] = temp;
+            }
+        }
+    }
+
+    
+    double menor = (double)T; // começa com o valor grande
+
+    double viz = (pos[1] - pos[0]) / 2.0 + pos[0]; 
+
+    printf("Menor vizinhanca de estrada: %.2lf\n", viz);
     
     fclose(arq);
 
     
     
-    return menor;
+    return viz;
 }
