@@ -10,11 +10,13 @@ char *cidadeMenorVizinhanca(const char *nomeArquivo) {
         return NULL;
     }
 
-    int T, N; 
-    fscanf(arq, "%d", &T);
-    fscanf(arq, "%d", &N);
+    int T, N;
+    if (fscanf(arq, "%d", &T) != 1 || fscanf(arq, "%d", &N) != 1) {
+        fclose(arq);
+        return NULL;
+    }
 
-    int *pos = (int*) malloc(N * sizeof(int));
+    int *pos = malloc(N * sizeof(int));
     char (*nomes)[256] = malloc(N * sizeof(*nomes));
     if (!pos || !nomes) {
         fclose(arq);
@@ -23,11 +25,31 @@ char *cidadeMenorVizinhanca(const char *nomeArquivo) {
         return NULL;
     }
 
+    // Leitura robusta dos nomes (inclui espaços e apóstrofos)
     for (int i = 0; i < N; i++) {
-        fscanf(arq, "%d %255s", &pos[i], nomes[i]);
+        if (fscanf(arq, "%d", &pos[i]) != 1) {
+            fclose(arq);
+            free(pos);
+            free(nomes);
+            return NULL;
+        }
+
+        // Pular espaços até o nome começar
+        while (fgetc(arq) == ' ');
+
+        fseek(arq, -1, SEEK_CUR); // volta um caractere
+        fgets(nomes[i], 256, arq);
+
+        // Remover \n do final
+        nomes[i][strcspn(nomes[i], "\r\n")] = 0;
+
+        // Remove espaço inicial, se existir
+        while (nomes[i][0] == ' ')
+            memmove(nomes[i], nomes[i] + 1, strlen(nomes[i]));
     }
     fclose(arq);
 
+    // Ordenar por posição crescente
     for (int i = 0; i < N - 1; i++) {
         for (int j = i + 1; j < N; j++) {
             if (pos[j] < pos[i]) {
@@ -43,6 +65,7 @@ char *cidadeMenorVizinhanca(const char *nomeArquivo) {
         }
     }
 
+    // Calcular a menor vizinhança
     double menorViz = 1e9;
     int idxMenor = 0;
 
@@ -61,8 +84,9 @@ char *cidadeMenorVizinhanca(const char *nomeArquivo) {
         }
     }
 
+    // Alocar e retornar o nome
     char *resultado = malloc(strlen(nomes[idxMenor]) + 1);
-    if (resultado != NULL)
+    if (resultado)
         strcpy(resultado, nomes[idxMenor]);
 
     free(pos);
