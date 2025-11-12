@@ -1,4 +1,7 @@
-10
-2
+30
+5
 8 Birnin Zana
-5 Birnin S'Yan
+4 Birnin S'Yan
+15 K'pur
+27 O'pur
+18 L'pur
